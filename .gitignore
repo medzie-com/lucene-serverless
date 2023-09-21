@@ -3,3 +3,4 @@ target/
 *.iml
 .serverless
 node_modules
+!target/function.zip

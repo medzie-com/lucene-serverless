@@ -11,18 +11,17 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 @Named("enqueue-index")
-public class EnqueueIndexHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class EnqueueIndexHandler implements RequestHandler<String, Integer> {
     protected String queueName = System.getenv("QUEUE_URL");
 
     @Inject
     protected SqsClient sqsClient;
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
+    public Integer handleRequest(String event, Context context) {
         this.sqsClient.sendMessage(SendMessageRequest.builder()
-                .messageBody(event.getBody())
+                .messageBody(event)
                 .queueUrl(queueName).build());
-
-        return new APIGatewayProxyResponseEvent().withStatusCode(200);
+        return 200;
     }
 }

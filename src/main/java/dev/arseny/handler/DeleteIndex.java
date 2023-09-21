@@ -13,16 +13,17 @@ import org.jboss.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
+import java.io.InputStream;
 
 @Named("deleteIndex")
-public class DeleteIndex implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
-    private static final Logger LOG = Logger.getLogger(IndexHandler.class);
+public class DeleteIndex implements RequestHandler<InputStream, Integer> {
+    private static final Logger LOG = Logger.getLogger(DeleteIndex.class);
 
     @Inject
     protected IndexWriterService indexWriterService;
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
+    public Integer handleRequest(InputStream event, Context context) {
         DeleteIndexRequest deleteIndexRequest = RequestUtils.parseDeleteIndexRequest(event);
 
         IndexWriter writer = indexWriterService.getIndexWriter(deleteIndexRequest.getIndexName());
@@ -33,8 +34,10 @@ public class DeleteIndex implements RequestHandler<APIGatewayProxyRequestEvent, 
             writer.close();
         } catch (IOException e) {
             LOG.error(e);
+            return 500;
         }
 
-        return new APIGatewayProxyResponseEvent().withStatusCode(200);
+        return 200;
+
     }
 }

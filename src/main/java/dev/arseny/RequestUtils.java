@@ -10,6 +10,7 @@ import dev.arseny.model.*;
 import org.jboss.logging.Logger;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 public class RequestUtils {
     private static final Logger LOG = Logger.getLogger(RequestUtils.class);
@@ -23,7 +24,8 @@ public class RequestUtils {
     public static APIGatewayProxyResponseEvent errorResponse(int errorCode, String message) {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         try {
-            return response.withStatusCode(errorCode).withBody(writer.writeValueAsString(new ErrorResponse(message, errorCode)));
+            return response.withStatusCode(errorCode)
+                    .withBody(writer.writeValueAsString(new ErrorResponse(message, errorCode)));
         } catch (JsonProcessingException e) {
             LOG.error(e);
             return response.withStatusCode(500).withBody("Internal error");
@@ -38,23 +40,18 @@ public class RequestUtils {
         }
     }
 
-    public static DeleteIndexRequest parseDeleteIndexRequest(APIGatewayProxyRequestEvent event) {
-        try {
-            return deleteIndexRequestReader.readValue(event.getBody());
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to parse a delete index request in body", e);
-        }
+    public static DeleteIndexRequest parseDeleteIndexRequest(InputStream event) {
+        return new DeleteIndexRequest();
     }
 
-    public static QueryRequest parseQueryRequest(APIGatewayProxyRequestEvent event) {
-        try {
-            return queryRequestReader.readValue(event.getBody());
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to parse a query request in body", e);
-        }
+    public static QueryRequest parseQueryRequest(String event) {
+        QueryRequest request = new QueryRequest();
+        request.setQuery(event);
+        return request;
     }
 
-    public static APIGatewayProxyResponseEvent successResponse(QueryResponse queryResponse) throws JsonProcessingException {
+    public static APIGatewayProxyResponseEvent successResponse(QueryResponse queryResponse)
+            throws JsonProcessingException {
         APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
         try {
             return response.withStatusCode(200).withBody(queryResponseWriter.writeValueAsString(queryResponse));

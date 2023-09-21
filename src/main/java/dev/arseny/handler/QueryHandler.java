@@ -23,14 +23,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Named("query")
-public class QueryHandler implements RequestHandler<APIGatewayProxyRequestEvent, APIGatewayProxyResponseEvent> {
+public class QueryHandler implements RequestHandler<String, QueryResponse> {
     private static final Logger LOG = Logger.getLogger(QueryHandler.class);
 
     @Inject
     protected IndexSearcherService indexSearcherService;
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(APIGatewayProxyRequestEvent event, Context context) {
+    public QueryResponse handleRequest(String event, Context context) {
         QueryRequest queryRequest = RequestUtils.parseQueryRequest(event);
 
         QueryParser qp = new QueryParser("content", new StandardAnalyzer());
@@ -40,7 +40,7 @@ public class QueryHandler implements RequestHandler<APIGatewayProxyRequestEvent,
         try {
             Query query = qp.parse(queryRequest.getQuery());
 
-            IndexSearcher searcher = indexSearcherService.getIndexSearcher(queryRequest.getIndexName());
+            IndexSearcher searcher = indexSearcherService.getIndexSearcher(System.getenv("index"));
 
             TopDocs topDocs = searcher.search(query, 10);
 
@@ -56,13 +56,17 @@ public class QueryHandler implements RequestHandler<APIGatewayProxyRequestEvent,
                 queryResponse.getDocuments().add(result);
             }
 
-            queryResponse.setTotalDocuments((topDocs.totalHits.relation == TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO ? "≥" : "") + topDocs.totalHits.value);
+            queryResponse.setTotalDocuments(
+                    (topDocs.totalHits.relation == TotalHits.Relation.GREATER_THAN_OR_EQUAL_TO ? "≥" : "")
+                            + topDocs.totalHits.value);
 
-            return RequestUtils.successResponse(queryResponse);
+            return queryResponse;
         } catch (ParseException | IOException e) {
             LOG.error(e);
 
-            return RequestUtils.errorResponse(500, "Error");
+            QueryResponse response = new QueryResponse();
+            response.setError(e.getMessage());
+            return response;
         }
     }
 }

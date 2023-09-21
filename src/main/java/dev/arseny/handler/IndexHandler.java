@@ -22,14 +22,14 @@ import java.util.List;
 import java.util.Map;
 
 @Named("index")
-public class IndexHandler implements RequestHandler<SQSEvent, APIGatewayProxyResponseEvent> {
+public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
     private static final Logger LOG = Logger.getLogger(IndexHandler.class);
 
     @Inject
     protected IndexWriterService indexWriterService;
 
     @Override
-    public APIGatewayProxyResponseEvent handleRequest(SQSEvent event, Context context) {
+    public Integer handleRequest(SQSEvent event, Context context) {
         List<SQSEvent.SQSMessage> records = event.getRecords();
 
         List<IndexRequest> requests = new ArrayList<>();
@@ -69,12 +69,19 @@ public class IndexHandler implements RequestHandler<SQSEvent, APIGatewayProxyRes
         for (IndexWriter writer : writerMap.values()) {
             try {
                 writer.commit();
-                writer.close();
             } catch (IOException e) {
                 LOG.error(e);
+                return 500;
+            } finally {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    LOG.error(e);
+                    return 500;
+                }
             }
         }
 
-        return new APIGatewayProxyResponseEvent().withStatusCode(200);
+        return 200;
     }
 }

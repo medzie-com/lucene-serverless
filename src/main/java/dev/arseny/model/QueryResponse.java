@@ -6,6 +6,7 @@ import java.util.Map;
 
 public class QueryResponse {
     private String totalDocuments;
+    private String error;
     private List<Map<String, String>> documents = new ArrayList<>();
 
     public QueryResponse() {
@@ -13,6 +14,14 @@ public class QueryResponse {
 
     public String getTotalDocuments() {
         return totalDocuments;
+    }
+
+    public String getError() {
+        return error;
+    }
+
+    public void setError(String error) {
+        this.error = error;
     }
 
     public void setTotalDocuments(String totalDocuments) {

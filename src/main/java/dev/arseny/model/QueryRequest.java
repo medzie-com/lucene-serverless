@@ -1,18 +1,13 @@
 package dev.arseny.model;
 
 public class QueryRequest {
-    private String indexName;
     private String query;
 
     public QueryRequest() {
     }
 
     public String getIndexName() {
-        return indexName;
-    }
-
-    public void setIndexName(String indexName) {
-        this.indexName = indexName;
+        return System.getenv("index");
     }
 
     public String getQuery() {

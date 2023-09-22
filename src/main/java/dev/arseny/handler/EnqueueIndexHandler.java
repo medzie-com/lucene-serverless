@@ -22,6 +22,8 @@ public class EnqueueIndexHandler implements RequestHandler<IndexRequest, Integer
 
     @Override
     public Integer handleRequest(IndexRequest event, Context context) {
+        event.setIndexName(System.getenv("index"));
+
         this.sqsClient.sendMessage(SendMessageRequest.builder()
                 .messageBody(RequestUtils.writeIndexRequest(event))
                 .queueUrl(queueName).build());

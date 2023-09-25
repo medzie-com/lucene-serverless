@@ -13,10 +13,14 @@ import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BooleanClause;
+import org.apache.lucene.search.TermQuery;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.management.Query;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -71,7 +75,7 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
                 writerMap.put(request.getIndexName(), writer);
             }
 
-            List<Pair<Term, Document>> documents = new ArrayList<>();
+            final List<Pair<org.apache.lucene.search.Query, Document>> documents = new ArrayList<>();
 
             for (Map<String, Object> requestDocument : request.getDocuments()) {
                 Document document = new Document();
@@ -79,11 +83,20 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
                     document.add(new TextField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
                 }
 
-                documents.add(new Pair<Term, Document>(new Term("id", (String) requestDocument.get("id")), document));
+                final org.apache.lucene.search.Query query = new TermQuery(
+                        new Term("id", requestDocument.get("id").toString()));
+
+                documents.add(new Pair<org.apache.lucene.search.Query, Document>(query, document));
             }
 
             try {
-                writer.deleteDocuments(documents.stream().map(v -> v.getLeft()).toArray(Term[]::new));
+                documents.stream().map(v -> v.getLeft()).forEach(t -> {
+                    try {
+                        writer.deleteDocuments(t);
+                    } catch (IOException e) {
+                        LOG.error(e);
+                    }
+                });
                 writer.addDocuments(documents.stream().map(v -> v.getRight()).collect(Collectors.toList()));
             } catch (IOException e) {
                 LOG.error(e);

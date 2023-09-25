@@ -274,7 +274,7 @@ resource aws_lambda_function "delete-index" {
 
     environment{
         variables = {
-            QUARKUS_LAMBDA_HANDLER = "delete-index"
+            QUARKUS_LAMBDA_HANDLER = "deleteIndex"
             QUARKUS_PROFILE = "production"
             index = "jobs"
         }

@@ -13,18 +13,17 @@ import org.jboss.logging.Logger;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.io.IOException;
-import java.io.InputStream;
 
 @Named("deleteIndex")
-public class DeleteIndex implements RequestHandler<InputStream, Integer> {
+public class DeleteIndex implements RequestHandler<Void, Integer> {
     private static final Logger LOG = Logger.getLogger(DeleteIndex.class);
 
     @Inject
     protected IndexWriterService indexWriterService;
 
     @Override
-    public Integer handleRequest(InputStream event, Context context) {
-        DeleteIndexRequest deleteIndexRequest = RequestUtils.parseDeleteIndexRequest(event);
+    public Integer handleRequest(Void event, Context context) {
+        DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest();
 
         IndexWriter writer = indexWriterService.getIndexWriter(deleteIndexRequest.getIndexName());
 

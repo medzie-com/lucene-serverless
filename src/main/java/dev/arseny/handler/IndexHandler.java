@@ -82,7 +82,7 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
             }
 
             try {
-                writer.deleteDocuments((Term[]) documents.stream().map(v -> v.getLeft()).toArray());
+                writer.deleteDocuments(documents.stream().map(v -> v.getLeft()).toArray(Term[]::new));
                 writer.addDocuments(documents.stream().map(v -> v.getRight()).toList());
             } catch (IOException e) {
                 LOG.error(e);

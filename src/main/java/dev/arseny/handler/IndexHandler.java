@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 class Pair<T, U> {
@@ -83,7 +84,7 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
 
             try {
                 writer.deleteDocuments(documents.stream().map(v -> v.getLeft()).toArray(Term[]::new));
-                writer.addDocuments(documents.stream().map(v -> v.getRight()).toList());
+                writer.addDocuments(documents.stream().map(v -> v.getRight()).collect(Collectors.toList()));
             } catch (IOException e) {
                 LOG.error(e);
             }

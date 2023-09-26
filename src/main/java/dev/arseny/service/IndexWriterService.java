@@ -20,7 +20,7 @@ public class IndexWriterService {
     public IndexWriter getIndexWriter(String indexName) {
         try {
             IndexWriter indexWriter = new IndexWriter(
-                    new SimpleFSDirectory(Paths.get(IndexConstants.LUCENE_INDEX_ROOT_DIRECTORY + indexName)),
+                    FSDirectory.open(Paths.get(IndexConstants.LUCENE_INDEX_ROOT_DIRECTORY + indexName)),
                     new IndexWriterConfig(new StandardAnalyzer())
                             .setIndexDeletionPolicy(NoDeletionPolicy.INSTANCE));
 

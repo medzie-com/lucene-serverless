@@ -2,9 +2,6 @@ package dev.arseny.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyRequestEvent;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
-
 import dev.arseny.RequestUtils;
 import dev.arseny.model.IndexRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;

@@ -2,32 +2,25 @@ package dev.arseny.handler;
 
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
-import com.amazonaws.services.lambda.runtime.events.APIGatewayProxyResponseEvent;
 import com.amazonaws.services.lambda.runtime.events.SQSEvent;
 import dev.arseny.RequestUtils;
 import dev.arseny.model.IndexRequest;
 import dev.arseny.service.IndexWriterService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.CorruptIndexException;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.TermQuery;
 import org.jboss.logging.Logger;
 
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.management.Query;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 class Pair<T, U> {
     private T left;
@@ -75,36 +68,34 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
                 writerMap.put(request.getIndexName(), writer);
             }
 
-            final List<Pair<org.apache.lucene.search.Query, Document>> documents = new ArrayList<>();
+            final List<Pair<Term, Document>> documents = new ArrayList<>();
 
             for (Map<String, Object> requestDocument : request.getDocuments()) {
                 Document document = new Document();
                 for (Map.Entry<String, Object> entry : requestDocument.entrySet()) {
-                    document.add(new TextField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
+                    if (entry.getKey() == "id")
+                        document.add(new StringField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
+                    else
+                        document.add(new TextField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
                 }
 
-                final org.apache.lucene.search.Query query = new TermQuery(
-                        new Term("id", requestDocument.get("id").toString()));
+                final Term query = new Term("id", requestDocument.get("id").toString());
 
-                documents.add(new Pair<org.apache.lucene.search.Query, Document>(query, document));
+                documents.add(new Pair<Term, Document>(query, document));
             }
 
-            try {
-                documents.stream().map(v -> v.getLeft()).forEach(t -> {
-                    try {
-                        writer.deleteDocuments(t);
-                    } catch (IOException e) {
-                        LOG.error(e);
-                    }
-                });
-                writer.addDocuments(documents.stream().map(v -> v.getRight()).collect(Collectors.toList()));
-            } catch (IOException e) {
-                LOG.error(e);
-            }
+            documents.stream().forEach(v -> {
+                try {
+                    writer.updateDocument(v.getLeft(), v.getRight());
+                } catch (IOException e) {
+                    LOG.error(e);
+                }
+            });
         }
 
         for (IndexWriter writer : writerMap.values()) {
             try {
+                writer.forceMergeDeletes(true);
                 writer.commit();
             } catch (IOException e) {
                 LOG.error(e);

@@ -9,6 +9,7 @@ import org.jboss.logging.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 
 public class RequestUtils {
     private static final Logger LOG = Logger.getLogger(RequestUtils.class);
@@ -40,9 +41,25 @@ public class RequestUtils {
         return new DeleteIndexRequest();
     }
 
-    public static QueryRequest parseQueryRequest(String event) {
-        QueryRequest request = new QueryRequest();
-        request.setQuery(event);
-        return request;
+    public static String escape(String query) {
+        return query
+                .replace("\\", "\\\\")
+                .replace("+", "\\+")
+                .replace("-", "\\-")
+                .replace("&&", "\\&&")
+                .replace("||", "\\||")
+                .replace("!", "\\!")
+                .replace("(", "\\(")
+                .replace(")", "\\)")
+                .replace("{", "\\{")
+                .replace("}", "\\}")
+                .replace("[", "\\[")
+                .replace("]", "\\]")
+                .replace("^", "\\^")
+                .replace("\"", "\\\"")
+                .replace("~", "\\~")
+                .replace("*", "\\*")
+                .replace("?", "\\?")
+                .replace(":", "\\:");
     }
 }

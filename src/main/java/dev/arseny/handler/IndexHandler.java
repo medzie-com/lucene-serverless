@@ -76,7 +76,8 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
                     if (entry.getKey() == "id")
                         document.add(new StringField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
                     else
-                        document.add(new TextField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
+                        document.add(new TextField(entry.getKey(), entry.getValue().toString(),
+                                entry.getKey().startsWith("text") ? Field.Store.NO : Field.Store.YES));
                 }
 
                 final Term query = new Term("id", requestDocument.get("id").toString());

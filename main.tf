@@ -11,12 +11,6 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket = "medzie-terraform2"
-    key    = "lucene"
-    region = "eu-west-3"
-  }
-
   required_version = ">= 1.5.0"
 }
 

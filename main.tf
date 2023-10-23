@@ -102,6 +102,7 @@ resource aws_efs_access_point lucene {
 resource aws_lambda_function query {
     function_name="${var.prefix}query"
     runtime="provided"
+    
     handler="native.handler"
     filename="${path.module}/target/function.zip"
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")
@@ -184,6 +185,11 @@ resource aws_lambda_function "enqueue-index" {
             index = "jobs"
         }
     }
+}
+
+resource "aws_iam_role_policy_attachment" "terraform_lambda_policy" {
+  role       = aws_iam_role.role.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole"
 }
 
 data "aws_iam_policy_document" "AWSLambdaTrustPolicy" {
@@ -289,18 +295,18 @@ resource "aws_efs_mount_target" "alpha" {
   security_groups = [data.aws_security_group.selected.id]
 }
 
-resource aws_vpc_endpoint queue-ep {
-  vpc_id = data.aws_vpc.selected.id
-  service_name = "com.amazonaws.eu-west-3.sqs"
-  vpc_endpoint_type = "Interface"
-  subnet_ids = [data.aws_subnet.selected.id]
-  private_dns_enabled = true
-  security_group_ids = [data.aws_security_group.selected.id]
+# resource aws_vpc_endpoint queue-ep {
+#   vpc_id = data.aws_vpc.selected.id
+#   service_name = "com.amazonaws.eu-west-3.sqs"
+#   vpc_endpoint_type = "Interface"
+#   subnet_ids = [data.aws_subnet.selected.id]
+#   private_dns_enabled = true
+#   security_group_ids = [data.aws_security_group.selected.id]
 
-  tags = {
-    Name="lucene-queue"
-  }
-}
+#   tags = {
+#     Name="lucene-queue"
+#   }
+# }
 
 
 resource "aws_lambda_event_source_mapping" "lucene-index" {

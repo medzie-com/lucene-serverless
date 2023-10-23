@@ -20,18 +20,6 @@ terraform {
   required_version = ">= 1.5.0"
 }
 
-
-provider "aws" {
-  region = "eu-west-3"
-
-  default_tags {
-    tags = {
-      environment = trimsuffix(var.prefix, "-")
-      terraform=true
-    }
-  }
-}
-
 variable "prefix" {
   type = string
 }

@@ -316,3 +316,10 @@ resource "aws_lambda_event_source_mapping" "lucene-index" {
     maximum_concurrency = 2
   }
 }
+
+
+resource "aws_cloudwatch_log_group" "cloudwatch" {
+  for_each          = toset(["enqueue-index", "index", "delete-index", "query"])
+  name              = "/aws/lambda/${var.prefix}${each.key}"
+  retention_in_days = var.environment != "prod" ? 1:365
+}

@@ -46,8 +46,10 @@ public class QueryHandler implements RequestHandler<Map<String, String>, QueryRe
             } else {
                 BooleanQuery.Builder builder = new BooleanQuery.Builder();
                 event.entrySet().stream()
-                        .forEach(e -> builder.add(qp.createBooleanQuery(e.getKey(), RequestUtils.escape(e.getValue())),
-                                Occur.SHOULD));
+                        .forEach(e -> {
+                            if(e.getKey()!=null && e.getValue()!=null)
+                            builder.add(qp.createBooleanQuery(e.getKey(), RequestUtils.escape(e.getValue())),
+                                Occur.SHOULD);});
                 query = builder.build();
             }
 

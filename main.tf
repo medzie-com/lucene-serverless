@@ -166,10 +166,10 @@ resource aws_lambda_function "enqueue-index" {
     role = aws_iam_role.role.arn
     timeout = 60
 
-    vpc_config {
-        security_group_ids = [data.aws_security_group.selected.id]
-        subnet_ids = [data.aws_subnet.selected.id]
-    }
+    # vpc_config {
+    #     security_group_ids = [data.aws_security_group.selected.id]
+    #     subnet_ids = [data.aws_subnet.selected.id]
+    # }
 
     file_system_config {
       arn=aws_efs_access_point.lucene.arn

@@ -48,8 +48,14 @@ public class QueryHandler implements RequestHandler<Map<String, String>, QueryRe
                 event.entrySet().stream()
                         .forEach(e -> {
                             if (e.getKey() != null && e.getValue() != null && e.getValue() != "")
-                                builder.add(qp.createBooleanQuery(e.getKey(), RequestUtils.escape(e.getValue())),
-                                        Occur.SHOULD);
+                            {
+                                if(e.getKey().startsWith('+'))
+                                    builder.add(qp.createBooleanQuery(e.getKey(), RequestUtils.escape(e.getValue())),
+                                            Occur.MUST);
+                                else
+                                    builder.add(qp.createBooleanQuery(e.getKey(), RequestUtils.escape(e.getValue())),
+                                            Occur.SHOULD);
+                            }
                         });
                 query = builder.build();
             }

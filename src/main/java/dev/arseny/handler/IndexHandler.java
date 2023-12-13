@@ -87,7 +87,10 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
 
             documents.stream().forEach(v -> {
                 try {
-                    writer.updateDocument(v.getLeft(), v.getRight());
+                    if(requestDocument.entrySet().size()==1)
+                        writer.deleteDocuments(v.getLeft());
+                    else
+                        writer.updateDocument(v.getLeft(), v.getRight());
                 } catch (IOException e) {
                     LOG.error(e);
                 }

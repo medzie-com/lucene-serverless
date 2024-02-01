@@ -23,6 +23,10 @@ variable "environment" {
   type = string
 }
 
+variable "indexName" {
+  type = string
+}
+
 
 resource "aws_sqs_queue_redrive_policy" "queue" {
   queue_url = aws_sqs_queue.queue.id
@@ -122,7 +126,7 @@ resource aws_lambda_function query {
         variables = {
             QUARKUS_LAMBDA_HANDLER = "query"
             QUARKUS_PROFILE = "production"
-            index = "jobs"
+            index = var.indexName
         }
     }
 }
@@ -152,7 +156,7 @@ resource aws_lambda_function index {
         variables = {
             QUARKUS_LAMBDA_HANDLER = "index"
             QUARKUS_PROFILE = "production"
-            index = "jobs"
+            index = var.indexName
         }
     }
 }
@@ -182,7 +186,7 @@ resource aws_lambda_function "enqueue-index" {
             QUARKUS_PROFILE = "production"
             QUEUE_URL = aws_sqs_queue.queue.id
 
-            index = "jobs"
+            index = var.indexName
         }
     }
 }
@@ -264,7 +268,7 @@ resource aws_lambda_function "delete-index" {
         variables = {
             QUARKUS_LAMBDA_HANDLER = "deleteIndex"
             QUARKUS_PROFILE = "production"
-            index = "jobs"
+            index = var.indexName
         }
     }
 }

@@ -25,6 +25,7 @@ variable "environment" {
 
 variable "indexName" {
   type = string
+  default = "jobs"
 }
 
 

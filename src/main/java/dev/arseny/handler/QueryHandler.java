@@ -63,7 +63,7 @@ public class QueryHandler implements RequestHandler<Map<String, String>, QueryRe
 
             IndexSearcher searcher = indexSearcherService.getIndexSearcher(System.getenv("index"));
 
-            TopDocs topDocs = searcher.search(query, 10);
+            TopDocs topDocs = searcher.search(query, 1000);
 
             for (ScoreDoc scoreDocs : topDocs.scoreDocs) {
                 Document document = searcher.doc(scoreDocs.doc);

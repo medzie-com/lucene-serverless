@@ -106,7 +106,7 @@ resource aws_efs_access_point lucene {
 
 resource aws_lambda_function query {
     function_name="${var.prefix}query"
-    runtime="provided"
+    runtime="provided.al2023"
     
     handler="native.handler"
     filename="${path.module}/target/function.zip"
@@ -134,7 +134,7 @@ resource aws_lambda_function query {
 
 resource aws_lambda_function index {
     function_name="${var.prefix}index"
-    runtime="provided"
+    runtime="provided.al2023"
     handler="native.handler"
     filename="${path.module}/target/function.zip"
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")
@@ -164,7 +164,7 @@ resource aws_lambda_function index {
 
 resource aws_lambda_function "enqueue-index" {
     function_name="${var.prefix}enqueue-index"
-    runtime="provided"
+    runtime="provided.al2023"
     handler="native.handler"
     filename="${path.module}/target/function.zip"
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")
@@ -249,7 +249,7 @@ resource "aws_iam_role_policy_attachment" "basic_lambda" {
 
 resource aws_lambda_function "delete-index" {
     function_name="${var.prefix}delete-index"
-    runtime="provided"
+    runtime="provided.al2023"
     handler="native.handler"
     filename="${path.module}/target/function.zip"
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")

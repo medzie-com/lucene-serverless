@@ -140,7 +140,7 @@ resource aws_lambda_function index {
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")
     role = aws_iam_role.role.arn
     memory_size = 1024
-    timeout = 10
+    timeout = 60
     # reserved_concurrent_executions = 1
 
     vpc_config {
@@ -322,9 +322,46 @@ resource "aws_lambda_event_source_mapping" "lucene-index" {
   }
 }
 
+locals {
+  functions=toset(["enqueue-index", "index", "delete-index", "query"])
+  commands= { for c in local.functions: c=>{function_name="${var.prefix}-${each.key}"}}
+}
 
 resource "aws_cloudwatch_log_group" "cloudwatch" {
-  for_each          = toset(["enqueue-index", "index", "delete-index", "query"])
+  for_each          = local.commands
   name              = "/aws/lambda/${var.prefix}${each.key}"
-  retention_in_days = var.environment != "prod" ? 1:365
+  retention_in_days = var.environment != "prod" ? 5:365
+}
+
+
+resource "aws_cloudwatch_metric_alarm" "alert" {
+  for_each = local.commands
+  alarm_name                = "${each.value.function_name}-errors"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = 1
+  metric_name               = "Errors"
+  namespace                 = "AWS/Lambda"
+  period                    = 300
+  statistic                 = "Average"
+  threshold                 = 1
+  alarm_description         = "This metric monitors lambda errors"
+  insufficient_data_actions = []
+
+  dimensions = {
+    FunctionName = each.value.function_name
+  }
+
+  alarm_actions = [
+    aws_sns_topic.function[each.key].arn,
+    aws_sns_topic.container.arn 
+  ]
+}
+
+resource "aws_sns_topic" "function" {
+  for_each = local.commands
+  name     = each.value.topic
+}
+
+resource "aws_sns_topic" "container" {
+  name = "${var.prefix}search"
 }

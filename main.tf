@@ -324,7 +324,7 @@ resource "aws_lambda_event_source_mapping" "lucene-index" {
 
 locals {
   functions=toset(["enqueue-index", "index", "delete-index", "query"])
-  commands= { for c in local.functions: c=>{function_name="${var.prefix}-${each.key}"}}
+  commands= { for c in local.functions: c=>{function_name="${var.prefix}-${c}"}}
 }
 
 resource "aws_cloudwatch_log_group" "cloudwatch" {

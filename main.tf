@@ -39,7 +39,7 @@ resource "aws_sqs_queue_redrive_policy" "queue" {
 
 resource "aws_sqs_queue" "queue" {
   name                       = "${var.prefix}lucene-write-queue"
-  # visibility_timeout_seconds = 900
+  visibility_timeout_seconds = 900
 
 }
 

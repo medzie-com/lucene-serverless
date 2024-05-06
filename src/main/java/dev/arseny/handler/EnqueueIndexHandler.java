@@ -7,8 +7,8 @@ import dev.arseny.model.IndexRequest;
 import software.amazon.awssdk.services.sqs.SqsClient;
 import software.amazon.awssdk.services.sqs.model.SendMessageRequest;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 
 @Named("enqueue-index")
 public class EnqueueIndexHandler implements RequestHandler<IndexRequest, Integer> {

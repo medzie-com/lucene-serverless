@@ -7,8 +7,8 @@ import dev.arseny.service.IndexWriterService;
 import org.apache.lucene.index.IndexWriter;
 import org.jboss.logging.Logger;
 
-import javax.inject.Inject;
-import javax.inject.Named;
+import jakarta.inject.Inject;
+import jakarta.inject.Named;
 import java.io.IOException;
 
 @Named("deleteIndex")

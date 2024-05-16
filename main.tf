@@ -41,14 +41,14 @@ resource "aws_sqs_queue" "queue" {
   name                       = "${var.prefix}lucene-write-queue.fifo"
   visibility_timeout_seconds = 900
   fifo_queue                  = true
-  # content_based_deduplication = true
+  content_based_deduplication = true
 }
 
 resource "aws_sqs_queue" "dlqueue" {
   name                      = "${var.prefix}lucene-write-dlqueue.fifo"
   message_retention_seconds = 1209600
   fifo_queue                  = true
-  # content_based_deduplication = true
+  content_based_deduplication = true
 }
 
 resource "aws_efs_file_system" "fs" {

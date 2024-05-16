@@ -23,6 +23,7 @@ public class EnqueueIndexHandler implements RequestHandler<IndexRequest, Integer
 
         this.sqsClient.sendMessage(SendMessageRequest.builder()
                 .messageBody(RequestUtils.writeIndexRequest(event))
+                .messageGroupId("main")
                 .queueUrl(queueName).build());
         return 200;
     }

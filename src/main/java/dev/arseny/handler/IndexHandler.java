@@ -8,17 +8,14 @@ import dev.arseny.model.IndexRequest;
 import dev.arseny.service.IndexWriterService;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.KnnFloatVectorField;
-import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.VectorSimilarityFunction;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.Term;
 import org.jboss.logging.Logger;
 
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -78,22 +75,9 @@ public class IndexHandler implements RequestHandler<SQSEvent, Integer> {
                 for (Map.Entry<String, Object> entry : requestDocument.entrySet()) {
                     if (entry.getKey() == "id")
                         document.add(new StringField(entry.getKey(), entry.getValue().toString(), Field.Store.YES));
-                    else {
-                        if (entry.getKey().startsWith("vector"))
-                            document.add(new KnnFloatVectorField(entry.getKey(), (float[]) entry.getValue(),
-                                    VectorSimilarityFunction.COSINE));
-                        else if (entry.getKey().startsWith("maploc"))
-                            document.add(
-                                    new LatLonDocValuesField(entry.getKey(),
-                                            ((Map<String, Double>) entry.getValue()).get("latitude"),
-                                            ((Map<String, Double>) entry.getValue()).get("longitude")));
-                        else if (entry.getKey().startsWith("text"))
-                            document.add(new TextField(entry.getKey(), entry.getValue().toString(),
-                                    Field.Store.NO));
-                        else
-                            document.add(new TextField(entry.getKey(), entry.getValue().toString(),
-                                    Field.Store.YES));
-                    }
+                    else
+                        document.add(new TextField(entry.getKey(), entry.getValue().toString(),
+                                entry.getKey().startsWith("text") ? Field.Store.NO : Field.Store.YES));
                 }
 
                 final Term query = new Term("id", requestDocument.get("id").toString());

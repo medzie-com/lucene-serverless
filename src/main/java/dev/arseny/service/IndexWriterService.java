@@ -5,10 +5,11 @@ import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.NoDeletionPolicy;
-import org.apache.lucene.store.NIOFSDirectory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.SimpleFSDirectory;
 import org.jboss.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -19,7 +20,7 @@ public class IndexWriterService {
     public IndexWriter getIndexWriter(String indexName) {
         try {
             IndexWriter indexWriter = new IndexWriter(
-                    NIOFSDirectory.open(Paths.get(IndexConstants.LUCENE_INDEX_ROOT_DIRECTORY + indexName)),
+                    FSDirectory.open(Paths.get(IndexConstants.LUCENE_INDEX_ROOT_DIRECTORY + indexName)),
                     new IndexWriterConfig(new StandardAnalyzer())
                             .setIndexDeletionPolicy(NoDeletionPolicy.INSTANCE));
 

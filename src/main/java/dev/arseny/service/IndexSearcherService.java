@@ -6,7 +6,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.store.FSDirectory;
 import org.jboss.logging.Logger;
 
-import jakarta.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.ApplicationScoped;
 import java.io.IOException;
 import java.nio.file.Paths;
 
@@ -21,8 +21,7 @@ public class IndexSearcherService {
             DirectoryReader newDirectoryReader;
 
             if (directoryReader == null) {
-                newDirectoryReader = DirectoryReader
-                        .open(FSDirectory.open(Paths.get(IndexConstants.LUCENE_INDEX_ROOT_DIRECTORY + indexName)));
+                newDirectoryReader = DirectoryReader.open(FSDirectory.open(Paths.get(IndexConstants.LUCENE_INDEX_ROOT_DIRECTORY + indexName)));
             } else {
                 newDirectoryReader = DirectoryReader.openIfChanged(directoryReader);
             }

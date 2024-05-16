@@ -38,9 +38,10 @@ resource "aws_sqs_queue_redrive_policy" "queue" {
 }
 
 resource "aws_sqs_queue" "queue" {
-  name                       = "${var.prefix}lucene-write-queue"
+  name                       = "${var.prefix}lucene-write-queue.fifo"
   visibility_timeout_seconds = 900
-
+  fifo_queue                  = true
+  content_based_deduplication = true
 }
 
 resource "aws_sqs_queue" "dlqueue" {
@@ -112,6 +113,7 @@ resource aws_lambda_function query {
     filename="${path.module}/target/function.zip"
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")
     role = aws_iam_role.role.arn
+    timeout = 15
 
     vpc_config {
         security_group_ids = [data.aws_security_group.selected.id]
@@ -251,6 +253,7 @@ resource aws_lambda_function "delete-index" {
     function_name="${var.prefix}delete-index"
     runtime="provided.al2023"
     handler="native.handler"
+    timeout = 300
     filename="${path.module}/target/function.zip"
     source_code_hash = filebase64sha256("${path.module}/target/function.zip")
     role = aws_iam_role.role.arn

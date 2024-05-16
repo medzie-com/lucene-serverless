@@ -45,8 +45,10 @@ resource "aws_sqs_queue" "queue" {
 }
 
 resource "aws_sqs_queue" "dlqueue" {
-  name                      = "${var.prefix}lucene-write-dlqueue"
+  name                      = "${var.prefix}lucene-write-dlqueue.fifo"
   message_retention_seconds = 1209600
+  fifo_queue                  = true
+  content_based_deduplication = true
 }
 
 resource "aws_efs_file_system" "fs" {

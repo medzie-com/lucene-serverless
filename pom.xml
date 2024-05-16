@@ -7,8 +7,8 @@
     <artifactId>lucene-serverless</artifactId>
     <version>1.0-SNAPSHOT</version>
     <properties>
-        <quarkus.version>1.11.4.Final</quarkus.version>
-        <lucene.version>8.4.1</lucene.version>
+        <quarkus.version>3.10.0</quarkus.version>
+        <lucene.version>9.10.0</lucene.version>
         <surefire-plugin.version>3.0.0-M4</surefire-plugin.version>
         <compiler-plugin.version>3.8.1</compiler-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -19,7 +19,7 @@
         <quarkus.native.container-runtime>docker</quarkus.native.container-runtime>
         <quarkus.native.container-build>true</quarkus.native.container-build>
         <quarkus.package.type>native</quarkus.package.type>
-        <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-native-image:20.3.1-java11</quarkus.native.builder-image>
+        <quarkus.native.builder-image>quay.io/quarkus/ubi-quarkus-graalvmce-builder-image:22.3-java17</quarkus.native.builder-image>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -31,10 +31,18 @@
                 <scope>import</scope>
             </dependency>
 
-            <dependency>
+            <!-- <dependency>
                 <groupId>software.amazon.awssdk</groupId>
                 <artifactId>bom</artifactId>
-                <version>2.16.12</version>
+                <version>2.25.44</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency> -->
+
+            <dependency>
+                <groupId>io.quarkus.platform</groupId>
+                <artifactId>quarkus-amazon-services-bom</artifactId>
+                <version>3.10.0</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -63,9 +71,10 @@
             <artifactId>lucene-queryparser</artifactId>
             <version>${lucene.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>software.amazon.awssdk</groupId>
-            <artifactId>sqs</artifactId>
+            <groupId>io.quarkiverse.amazonservices</groupId>
+            <artifactId>quarkus-amazon-sqs</artifactId>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>

@@ -51,42 +51,27 @@ public class QueryHandler implements RequestHandler<Map<String, Object>, QueryRe
                 event.entrySet().stream()
                         .forEach(e -> {
                             if (e.getKey() != null && e.getValue() != null && e.getValue() != "") {
-                                if (e.getKey().startsWith("+")) {
-                                    if (e.getKey().startsWith("vector"))
-                                        builder.add(
-                                                new KnnFloatVectorQuery(e.getKey(),
-                                                        (float[]) e.getValue(), 1000),
-                                                Occur.MUST);
-                                    else if (e.getKey().startsWith("maploc"))
-                                        builder.add(
-                                                LatLonPoint.newDistanceQuery(e.getKey(),
-                                                        ((float[]) e.getValue())[0], ((float[]) e.getValue())[1],
-                                                        ((float[]) e.getValue())[2]),
-                                                Occur.MUST);
-                                    else
-                                        builder.add(
-                                                qp.createBooleanQuery(e.getKey().substring(1),
-                                                        RequestUtils.escape(e.getValue().toString())),
-                                                Occur.MUST);
-                                } else {
-
-                                    if (e.getKey().startsWith("vector"))
-                                        builder.add(
-                                                new KnnFloatVectorQuery(e.getKey(),
-                                                        (float[]) e.getValue(), 1000),
-                                                Occur.SHOULD);
-                                    else if (e.getKey().startsWith("maploc"))
-                                        builder.add(
-                                                LatLonPoint.newDistanceQuery(e.getKey(),
-                                                        ((float[]) e.getValue())[0], ((float[]) e.getValue())[1],
-                                                        ((float[]) e.getValue())[2]),
-                                                Occur.SHOULD);
-                                    else
-                                        builder.add(
-                                                qp.createBooleanQuery(e.getKey(),
-                                                        RequestUtils.escape(e.getValue().toString())),
-                                                Occur.SHOULD);
-                                }
+                                if (e.getKey().startsWith("+"))
+                                    builder.add(
+                                            qp.createBooleanQuery(e.getKey().substring(1),
+                                                    RequestUtils.escape(e.getValue().toString())),
+                                            Occur.MUST);
+                                else if (e.getKey().startsWith("vector"))
+                                    builder.add(
+                                            new KnnFloatVectorQuery(e.getKey(),
+                                                    (float[]) e.getValue(), 1000),
+                                            Occur.MUST);
+                                else if (e.getKey().startsWith("maploc"))
+                                    builder.add(
+                                            LatLonPoint.newDistanceQuery(e.getKey(),
+                                                    ((float[]) e.getValue())[0], ((float[]) e.getValue())[1],
+                                                    ((float[]) e.getValue())[2]),
+                                            Occur.MUST);
+                                else
+                                    builder.add(
+                                            qp.createBooleanQuery(e.getKey(),
+                                                    RequestUtils.escape(e.getValue().toString())),
+                                            Occur.SHOULD);
                             }
                         });
                 query = builder.build();
@@ -117,9 +102,7 @@ public class QueryHandler implements RequestHandler<Map<String, Object>, QueryRe
                             + topDocs.totalHits.value);
 
             return queryResponse;
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             LOG.error(e);
 
             QueryResponse response = new QueryResponse();
